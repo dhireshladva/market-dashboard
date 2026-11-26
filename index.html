@@ -151,10 +151,6 @@ td:first-child,td.l{text-align:left}
 .h-w{color:var(--accent);font-size:10px;min-width:30px;text-align:right}
 .h-sym{color:#ffffff;font-weight:500}
 .h-nm{color:var(--text3);font-size:10px}
-.ob-grid{display:grid;grid-template-columns:70px repeat(7,minmax(0,1fr));gap:6px;align-items:center}
-.ob-h{font-size:8.5px;color:var(--text3);letter-spacing:1.2px;text-transform:uppercase;text-align:center}
-.ob-lbl{font-size:12px;font-weight:600;color:var(--accent);letter-spacing:1.5px}
-.ob-grid iframe{width:100%;height:78px;border:1px solid var(--border);border-radius:4px;background:var(--bg3)}
 .h-item.tn-link{cursor:pointer;border-bottom:1px solid var(--border);transition:border-color .15s,background .15s}
 .h-item.tn-link:hover{border-color:var(--accent);background:var(--bg2)}
 .h-item.tn-link:hover .h-sym,.h-item.tn-link:hover .h-nm{color:var(--accent)}
@@ -331,35 +327,13 @@ td:first-child,td.l{text-align:left}
   <div class="sec-hdr">
     <div class="sec-n">02</div>
     <div class="sec-t">Market Breadth &amp; Sentiment</div>
-    <div class="sec-sub">NYSE &amp; NASDAQ OFFICIAL BREADTH &middot; SENTIMENT INDICATORS</div>
+    <div class="sec-sub">S&amp;P 500 INTERNALS &middot; SENTIMENT INDICATORS &middot; UPDATED DAILY</div>
   </div>
   <div class="card" style="padding:16px 18px">
     <div class="card-lbl" style="margin-bottom:14px">&#9658; Market Internals Dashboard</div>
-    <div id="breadthGrid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px">
-      <div style="color:var(--text3);font-size:11px;grid-column:span 2;text-align:center;padding:20px 0">Loading sentiment data&hellip;</div>
+    <div id="breadthGrid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:10px">
+      <div style="color:var(--text3);font-size:11px;grid-column:span 7;text-align:center;padding:20px 0">Loading breadth data&hellip;</div>
     </div>
-
-    <div class="card-lbl" style="margin:18px 0 10px">&#9658; Official Exchange Breadth &mdash; live from TradingView</div>
-    <div class="ob-grid">
-      <div></div><div class="ob-h">Advancers</div><div class="ob-h">Decliners</div><div class="ob-h">52-Wk Highs</div><div class="ob-h">52-Wk Lows</div><div class="ob-h">% &gt; SMA 20</div><div class="ob-h">% &gt; SMA 50</div><div class="ob-h">% &gt; SMA 200</div>
-      <div class="ob-lbl">NYSE</div>
-      <iframe loading="lazy" title="USI:ADV" src="https://s.tradingview.com/embed-widget/single-quote/?locale=en#%7B%22symbol%22%3A%22USI%3AADV%22%2C%22width%22%3A%22100%25%22%2C%22colorTheme%22%3A%22dark%22%2C%22isTransparent%22%3Atrue%2C%22locale%22%3A%22en%22%7D"></iframe>
-      <iframe loading="lazy" title="USI:DECL" src="https://s.tradingview.com/embed-widget/single-quote/?locale=en#%7B%22symbol%22%3A%22USI%3ADECL%22%2C%22width%22%3A%22100%25%22%2C%22colorTheme%22%3A%22dark%22%2C%22isTransparent%22%3Atrue%2C%22locale%22%3A%22en%22%7D"></iframe>
-      <iframe loading="lazy" title="INDEX:MAHN" src="https://s.tradingview.com/embed-widget/single-quote/?locale=en#%7B%22symbol%22%3A%22INDEX%3AMAHN%22%2C%22width%22%3A%22100%25%22%2C%22colorTheme%22%3A%22dark%22%2C%22isTransparent%22%3Atrue%2C%22locale%22%3A%22en%22%7D"></iframe>
-      <iframe loading="lazy" title="INDEX:MALN" src="https://s.tradingview.com/embed-widget/single-quote/?locale=en#%7B%22symbol%22%3A%22INDEX%3AMALN%22%2C%22width%22%3A%22100%25%22%2C%22colorTheme%22%3A%22dark%22%2C%22isTransparent%22%3Atrue%2C%22locale%22%3A%22en%22%7D"></iframe>
-      <iframe loading="lazy" title="INDEX:MMTW" src="https://s.tradingview.com/embed-widget/single-quote/?locale=en#%7B%22symbol%22%3A%22INDEX%3AMMTW%22%2C%22width%22%3A%22100%25%22%2C%22colorTheme%22%3A%22dark%22%2C%22isTransparent%22%3Atrue%2C%22locale%22%3A%22en%22%7D"></iframe>
-      <iframe loading="lazy" title="INDEX:MMFI" src="https://s.tradingview.com/embed-widget/single-quote/?locale=en#%7B%22symbol%22%3A%22INDEX%3AMMFI%22%2C%22width%22%3A%22100%25%22%2C%22colorTheme%22%3A%22dark%22%2C%22isTransparent%22%3Atrue%2C%22locale%22%3A%22en%22%7D"></iframe>
-      <iframe loading="lazy" title="INDEX:MMTH" src="https://s.tradingview.com/embed-widget/single-quote/?locale=en#%7B%22symbol%22%3A%22INDEX%3AMMTH%22%2C%22width%22%3A%22100%25%22%2C%22colorTheme%22%3A%22dark%22%2C%22isTransparent%22%3Atrue%2C%22locale%22%3A%22en%22%7D"></iframe>
-      <div class="ob-lbl">NASDAQ</div>
-      <iframe loading="lazy" title="USI:ADVQ" src="https://s.tradingview.com/embed-widget/single-quote/?locale=en#%7B%22symbol%22%3A%22USI%3AADVQ%22%2C%22width%22%3A%22100%25%22%2C%22colorTheme%22%3A%22dark%22%2C%22isTransparent%22%3Atrue%2C%22locale%22%3A%22en%22%7D"></iframe>
-      <iframe loading="lazy" title="USI:DECLQ" src="https://s.tradingview.com/embed-widget/single-quote/?locale=en#%7B%22symbol%22%3A%22USI%3ADECLQ%22%2C%22width%22%3A%22100%25%22%2C%22colorTheme%22%3A%22dark%22%2C%22isTransparent%22%3Atrue%2C%22locale%22%3A%22en%22%7D"></iframe>
-      <iframe loading="lazy" title="INDEX:MAHQ" src="https://s.tradingview.com/embed-widget/single-quote/?locale=en#%7B%22symbol%22%3A%22INDEX%3AMAHQ%22%2C%22width%22%3A%22100%25%22%2C%22colorTheme%22%3A%22dark%22%2C%22isTransparent%22%3Atrue%2C%22locale%22%3A%22en%22%7D"></iframe>
-      <iframe loading="lazy" title="INDEX:MALQ" src="https://s.tradingview.com/embed-widget/single-quote/?locale=en#%7B%22symbol%22%3A%22INDEX%3AMALQ%22%2C%22width%22%3A%22100%25%22%2C%22colorTheme%22%3A%22dark%22%2C%22isTransparent%22%3Atrue%2C%22locale%22%3A%22en%22%7D"></iframe>
-      <iframe loading="lazy" title="INDEX:NCTW" src="https://s.tradingview.com/embed-widget/single-quote/?locale=en#%7B%22symbol%22%3A%22INDEX%3ANCTW%22%2C%22width%22%3A%22100%25%22%2C%22colorTheme%22%3A%22dark%22%2C%22isTransparent%22%3Atrue%2C%22locale%22%3A%22en%22%7D"></iframe>
-      <iframe loading="lazy" title="INDEX:NCFI" src="https://s.tradingview.com/embed-widget/single-quote/?locale=en#%7B%22symbol%22%3A%22INDEX%3ANCFI%22%2C%22width%22%3A%22100%25%22%2C%22colorTheme%22%3A%22dark%22%2C%22isTransparent%22%3Atrue%2C%22locale%22%3A%22en%22%7D"></iframe>
-      <iframe loading="lazy" title="INDEX:NCTH" src="https://s.tradingview.com/embed-widget/single-quote/?locale=en#%7B%22symbol%22%3A%22INDEX%3ANCTH%22%2C%22width%22%3A%22100%25%22%2C%22colorTheme%22%3A%22dark%22%2C%22isTransparent%22%3Atrue%2C%22locale%22%3A%22en%22%7D"></iframe>
-    </div>
-    <div style="font-size:8.5px;color:var(--text3);margin-top:8px;line-height:1.5">Advancers / decliners and 52-week highs / lows are official per-exchange figures. NYSE &ldquo;% above MA&rdquo; uses MMTW / MMFI / MMTH (broad US market &mdash; TradingView has no NYSE-only series); NASDAQ uses the Nasdaq Composite (NCTW / NCFI / NCTH). Click any box to open it on TradingView.</div>
   </div>
 </div>
 
@@ -1190,12 +1164,11 @@ function toast(msg){
 // MARKET BREADTH & SENTIMENT
 // ═══════════════════════════════════════════════════════
 function renderBreadth(d) {
-  // Sentiment cards only - exchange breadth comes live from the official TradingView boxes below.
   const br = d ? d.breadth : null;
   const grid = document.getElementById('breadthGrid');
   if (!grid) return;
   if (!br) {
-    grid.innerHTML = '<div style="color:var(--text3);font-size:11px;grid-column:span 2;text-align:center;padding:20px 0">Sentiment data unavailable — run fetch_data.py to generate</div>';
+    grid.innerHTML = '<div style="color:var(--text3);font-size:11px;grid-column:span 7;text-align:center;padding:20px 0">Breadth data unavailable — run fetch_data.py to generate</div>';
     return;
   }
   grid.innerHTML = '';
@@ -1210,12 +1183,34 @@ function renderBreadth(d) {
   const nmCol = nmVal >= 80 ? 'var(--red)' : nmVal <= 30 ? 'var(--green)' : 'var(--amber)';
   const nmLbl = nmVal >= 80 ? 'OVEREXPOSED' : nmVal >= 50 ? 'BULLISH' : nmVal >= 30 ? 'NEUTRAL' : 'DEFENSIVE';
 
+  const ad = br.advance_decline || {};
+  const adv = ad.advancers ?? 0, dec = ad.decliners ?? 0, adNet = adv - dec;
+  const adCol = adNet >= 0 ? 'var(--green)' : 'var(--red)';
+
+  const hl = br.new_high_low || {};
+  const nH = hl.new_highs ?? 0, nL = hl.new_lows ?? 0, hlNet = nH - nL;
+  const hlCol = hlNet >= 0 ? 'var(--green)' : 'var(--red)';
+
+  const p20  = br.pct_above_sma20  ?? 0;
+  const p50  = br.pct_above_sma50  ?? 0;
+  const p200 = br.pct_above_sma200 ?? 0;
+  const pCol = p => p >= 60 ? 'var(--green)' : p <= 40 ? 'var(--red)' : 'var(--amber)';
+  const pLbl = p => p >= 60 ? 'BROAD STRENGTH' : p <= 40 ? 'WEAK BREADTH'  : 'MIXED';
+
+  const fmt = n => n >= 1000 ? n.toLocaleString() : String(n);
+  const netStr = n => (n >= 0 ? '▲ +' : '▼ ') + fmt(Math.abs(n)) + ' net';
+
   const cards = [
-    { lbl:'Fear & Greed',   val:fgScore.toFixed(0),   sub:fgRating.toUpperCase(), col:fgCol, note:'CNN Index · 0=Extreme Fear, 100=Extreme Greed' },
-    { lbl:'NAAIM Exposure', val:nmVal.toFixed(0)+'%', sub:nmLbl,                  col:nmCol, note:'Active mgr equity exposure · ' + (nm.date || 'weekly') },
+    { lbl:'Fear & Greed',   val:fgScore.toFixed(0),     sub:fgRating.toUpperCase(), col:fgCol,    note:'CNN Index · 0=Extreme Fear, 100=Extreme Greed' },
+    { lbl:'NAAIM Exposure', val:nmVal.toFixed(0)+'%',   sub:nmLbl,                  col:nmCol,    note:'Active mgr equity exposure · ' + (nm.date || 'weekly') },
+    { lbl:'Advancers',      val:fmt(adv),               sub:netStr(adNet),           col:adCol,    note:'S&P 500 · vs ' + fmt(dec) + ' decliners · session' },
+    { lbl:'New Highs',      val:fmt(nH),                sub:netStr(hlNet),           col:hlCol,    note:'S&P 500 · vs ' + fmt(nL) + ' new lows · 52-wk' },
+    { lbl:'% > SMA 20', val:p20.toFixed(1)+'%',  sub:pLbl(p20),              col:pCol(p20), note:'S&P 500 stocks above 20-day MA' },
+    { lbl:'% > SMA 50', val:p50.toFixed(1)+'%',  sub:pLbl(p50),              col:pCol(p50), note:'S&P 500 stocks above 50-day MA' },
+    { lbl:'% > SMA 200',    val:p200.toFixed(1)+'%',   sub:pLbl(p200),             col:pCol(p200),note:'S&P 500 stocks above 200-day MA' },
   ];
 
-  cards.forEach(c => {
+  const makeCard = c => {
     const el = document.createElement('div');
     el.style.cssText = 'background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:12px 8px;text-align:center;display:flex;flex-direction:column;gap:4px;min-height:100px;justify-content:space-between';
     el.innerHTML =
@@ -1224,7 +1219,35 @@ function renderBreadth(d) {
     + '<div style="font-size:8.5px;color:' + c.col + ';letter-spacing:0.5px;font-weight:500">'            + c.sub + '</div>'
     + '<div style="font-size:7.5px;color:var(--text3);line-height:1.3">'                                  + c.note + '</div>';
     grid.appendChild(el);
-  });
+  };
+  cards.forEach(makeCard);
+
+  // ── Nasdaq-100 row (directly under the S&P 500 breadth cards) ──
+  const lab = document.createElement('div');
+  lab.style.cssText = 'grid-column:span 2;display:flex;flex-direction:column;justify-content:center;align-items:flex-end;gap:4px;padding-right:8px;text-align:right';
+  lab.innerHTML = '<div style="font-size:12px;font-weight:600;color:var(--accent);letter-spacing:1.5px">NASDAQ-100 &#9658;</div>'
+    + '<div style="font-size:8.5px;color:var(--text3);line-height:1.4">Same breadth measures for the<br>~100 Nasdaq-100 stocks</div>';
+  grid.appendChild(lab);
+  const nq = br.nasdaq100;
+  if (!nq) {
+    const e = document.createElement('div');
+    e.style.cssText = 'grid-column:span 5;background:var(--bg3);border:1px solid var(--border);border-radius:4px;display:flex;align-items:center;justify-content:center;min-height:100px;font-size:10px;color:var(--text3)';
+    e.textContent = 'Nasdaq-100 breadth will appear after the next data refresh';
+    grid.appendChild(e);
+  } else {
+    const qad = nq.advance_decline || {};
+    const qAdv = qad.advancers ?? 0, qDec = qad.decliners ?? 0, qAdNet = qAdv - qDec;
+    const qhl = nq.new_high_low || {};
+    const qH = qhl.new_highs ?? 0, qL = qhl.new_lows ?? 0, qHlNet = qH - qL;
+    const q20 = nq.pct_above_sma20 ?? 0, q50 = nq.pct_above_sma50 ?? 0, q200 = nq.pct_above_sma200 ?? 0;
+    [
+      { lbl:'Advancers',   val:fmt(qAdv),             sub:netStr(qAdNet), col:qAdNet >= 0 ? 'var(--green)' : 'var(--red)', note:'vs ' + fmt(qDec) + ' decliners · session' },
+      { lbl:'New Highs',   val:fmt(qH),               sub:netStr(qHlNet), col:qHlNet >= 0 ? 'var(--green)' : 'var(--red)', note:'vs ' + fmt(qL) + ' new lows · 52-wk' },
+      { lbl:'% > SMA 20',  val:q20.toFixed(1)+'%',    sub:pLbl(q20),      col:pCol(q20),  note:'Nasdaq-100 stocks above 20-day MA' },
+      { lbl:'% > SMA 50',  val:q50.toFixed(1)+'%',    sub:pLbl(q50),      col:pCol(q50),  note:'Nasdaq-100 stocks above 50-day MA' },
+      { lbl:'% > SMA 200', val:q200.toFixed(1)+'%',   sub:pLbl(q200),     col:pCol(q200), note:'Nasdaq-100 stocks above 200-day MA' },
+    ].forEach(makeCard);
+  }
 }
 
 // ═══════════════════════════════════════════════════════

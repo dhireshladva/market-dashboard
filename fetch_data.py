@@ -529,43 +529,56 @@ def fetch_naaim():
         return None
 
 # ── S&P 500 BREADTH COMPUTATION ──────────────────────────────────────────────────────────────────────
-def get_nasdaq100_tickers():
-    """Nasdaq-100 component list from Wikipedia (table id='constituents', 'Ticker' column)."""
-    from bs4 import BeautifulSoup
-    print("  Fetching Nasdaq-100 component list...")
-    r = requests.get('https://en.wikipedia.org/wiki/List_of_NASDAQ-100_companies',
-                     timeout=15, headers={'User-Agent': 'Mozilla/5.0'})
-    r.raise_for_status()
-    soup = BeautifulSoup(r.text, 'html.parser')
-    table = soup.find('table', {'id': 'constituents'})
-    if not table:
-        raise ValueError("Nasdaq-100 constituents table not found")
-    rows = table.find_all('tr')
-    headers = [th.get_text(strip=True).lower() for th in rows[0].find_all('th')]
-    col = 0
-    for i, h in enumerate(headers):
-        if h.startswith('ticker') or h.startswith('symbol'):
-            col = i
-            break
+def get_nasdaq_composite_tickers():
+    """All Nasdaq-listed common stocks (the Nasdaq Composite universe): no ETFs, test issues,
+    warrants, units, rights, preferreds or notes. Source: Nasdaq Trader symbol directory,
+    with a GitHub mirror of Nasdaq's screener as a fallback."""
+    import re
+    excl = re.compile(r'\b(warrants?|units?|rights?|preferred|notes?|debentures?|subordinated|'
+                      r'depositary shares? each representing a fractional)\b', re.I)
+    ok_sym = re.compile(r'[A-Z]{1,5}')
     tickers = []
-    for row in rows[1:]:
-        cells = row.find_all(['td', 'th'])
-        if len(cells) > col:
-            t = cells[col].get_text(strip=True).replace('.', '-')
-            if t:
-                tickers.append(t)
-    if len(tickers) < 50:
-        raise ValueError(f"Only {len(tickers)} Nasdaq-100 tickers found")
+    try:
+        print("  Fetching Nasdaq-listed symbols (nasdaqtrader.com)...")
+        r = requests.get('https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqlisted.txt',
+                         timeout=20, headers={'User-Agent': 'Mozilla/5.0'})
+        r.raise_for_status()
+        lines = r.text.strip().splitlines()
+        hdr = lines[0].split('|')
+        i_sym, i_name = hdr.index('Symbol'), hdr.index('Security Name')
+        i_test, i_etf = hdr.index('Test Issue'), hdr.index('ETF')
+        for ln in lines[1:]:
+            p = ln.split('|')
+            if len(p) < len(hdr) or ln.startswith('File Creation Time'):
+                continue
+            if p[i_test] == 'Y' or p[i_etf] == 'Y':
+                continue
+            if excl.search(p[i_name]) or not ok_sym.fullmatch(p[i_sym]):
+                continue
+            tickers.append(p[i_sym])
+    except Exception as e:
+        print(f"  ⚠ nasdaqtrader list failed ({e}); trying fallback list...")
+        r = requests.get('https://raw.githubusercontent.com/rreichel3/US-Stock-Symbols/main/nasdaq/nasdaq_full_tickers.json',
+                         timeout=30)
+        r.raise_for_status()
+        for x in r.json():
+            if excl.search(x.get('name', '')) or not ok_sym.fullmatch(x.get('symbol', '')):
+                continue
+            tickers.append(x['symbol'])
+    tickers = sorted(set(tickers))
+    if len(tickers) < 1500:
+        raise ValueError(f"Only {len(tickers)} Nasdaq tickers found")
+    print(f"  Nasdaq Composite universe: {len(tickers)} stocks")
     return tickers
 
-def compute_ndx_breadth():
-    """Same breadth metrics as the S&P 500, for the Nasdaq-100."""
+def compute_nasdaq_comp_breadth():
+    """Same breadth metrics as the S&P 500, for all Nasdaq Composite stocks."""
     try:
-        tickers = get_nasdaq100_tickers()
+        tickers = get_nasdaq_composite_tickers()
     except Exception as e:
-        print(f"  ⚠ Nasdaq-100 list failed: {e}")
+        print(f"  ⚠ Nasdaq Composite list failed: {e}")
         return None
-    return compute_sp500_breadth(tickers=tickers, label='Nasdaq-100')
+    return compute_sp500_breadth(tickers=tickers, label='Nasdaq Composite')
 
 def compute_sp500_breadth(tickers=None, label='S&P 500'):
     """Download index component data and compute breadth metrics (S&P 500 by default)."""
@@ -590,13 +603,28 @@ def compute_sp500_breadth(tickers=None, label='S&P 500'):
             raise ValueError("No tickers found in Wikipedia table")
       if True:
         print(f"  [{label}] Downloading {len(tickers)} tickers (1 year of daily closes)...")
-        raw = yf.download(tickers, period='1y', interval='1d',
-                          auto_adjust=True, progress=False, threads=True)
-        if raw.empty:
+        # Download in batches so large universes (e.g. ~3,400 Nasdaq stocks) don't overload Yahoo
+        import time
+        parts = []
+        batch = 400
+        for i in range(0, len(tickers), batch):
+            chunk = tickers[i:i + batch]
+            try:
+                raw = yf.download(chunk, period='1y', interval='1d',
+                                  auto_adjust=True, progress=False, threads=True)
+                if not raw.empty:
+                    c = raw['Close'] if isinstance(raw.columns, pd.MultiIndex) else raw[['Close']].rename(columns={'Close': chunk[0]})
+                    parts.append(c)
+            except Exception as ce:
+                print(f"  ⚠ batch {i // batch + 1} failed: {ce}")
+            if len(tickers) > batch:
+                time.sleep(2)
+        if not parts:
             raise ValueError("No data returned")
 
         # Extract close prices
-        close = raw['Close'] if isinstance(raw.columns, pd.MultiIndex) else raw
+        close = pd.concat(parts, axis=1)
+        close = close.loc[:, ~close.columns.duplicated()]
         close = close.dropna(axis=1, how='all').ffill()
         if len(close) < 5:
             raise ValueError("Not enough trading days in data")
@@ -659,7 +687,7 @@ def fetch_breadth():
         'pct_above_sma20':  sp.get('pct_above_sma20')  if sp else None,
         'pct_above_sma50':  sp.get('pct_above_sma50')  if sp else None,
         'pct_above_sma200': sp.get('pct_above_sma200') if sp else None,
-        'nasdaq100':        compute_ndx_breadth(),
+        'nasdaq_composite': compute_nasdaq_comp_breadth(),
     }
     return result
 

@@ -151,6 +151,9 @@ td:first-child,td.l{text-align:left}
 .h-w{color:var(--accent);font-size:10px;min-width:30px;text-align:right}
 .h-sym{color:#ffffff;font-weight:500}
 .h-nm{color:var(--text3);font-size:10px}
+.h-item.tn-link{cursor:pointer;border-bottom:1px solid var(--border);transition:border-color .15s,background .15s}
+.h-item.tn-link:hover{border-color:var(--accent);background:var(--bg2)}
+.h-item.tn-link:hover .h-sym,.h-item.tn-link:hover .h-nm{color:var(--accent)}
 
 /* ── POSITION CALC ── */
 .calc-wrap{display:grid;grid-template-columns:320px 1fr;gap:10px}
@@ -872,7 +875,7 @@ function holdRow(id,sym){
   const h=HOLDINGS[sym]||[];
   return`<tr class="holdings-row" id="hold${id}"><td colspan="9" style="padding:0"><div class="holdings-inner">
     <div class="h-title">TOP 10 HOLDINGS BY WEIGHT</div>
-    <div class="h-list">${h.map(x=>`<div class="h-item"><span class="h-w">${x.w.toFixed(1)}%</span><span class="h-sym">${x.s}</span><span class="h-nm">${x.n}</span></div>`).join('')}</div>
+    <div class="h-list">${h.map(x=>`<div class="h-item tn-link" title="Click for chart · Shift+click to open in your TradingView" data-sym="${String(x.s).replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" data-nm="${String(x.n).replace(/&/g,'&amp;').replace(/"/g,'&quot;')}"><span class="h-w">${x.w.toFixed(1)}%</span><span class="h-sym">${x.s}</span><span class="h-nm">${x.n}</span></div>`).join('')}</div>
   </div></td></tr>`;
 }
 
@@ -936,7 +939,7 @@ function buildRows(data, tbodyId, opts={}) {
         const colspan = (rank?1:0)+1+(hasPrice?1:0)+4+1+(showEma?1:0)+(hasHoldings?1:0);
         holdTr.innerHTML=`<td colspan="${colspan}" style="padding:0"><div class="holdings-inner">
           <div class="h-title">TOP 10 HOLDINGS BY WEIGHT — ${META[sym]?.name||sym}</div>
-          <div class="h-list">${h.map(x=>`<div class="h-item"><span class="h-w">${x.w.toFixed(1)}%</span><span class="h-sym">${x.s}</span><span class="h-nm">${x.n}</span></div>`).join('')}</div>
+          <div class="h-list">${h.map(x=>`<div class="h-item tn-link" title="Click for chart · Shift+click to open in your TradingView" data-sym="${String(x.s).replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" data-nm="${String(x.n).replace(/&/g,'&amp;').replace(/"/g,'&quot;')}"><span class="h-w">${x.w.toFixed(1)}%</span><span class="h-sym">${x.s}</span><span class="h-nm">${x.n}</span></div>`).join('')}</div>
         </div></td>`;
         tbody.appendChild(holdTr);
       }
@@ -1106,7 +1109,13 @@ function toTvSym(raw) {
     'BTC':'CRYPTOCAP:BTC','ETH':'CRYPTOCAP:ETH',
     'SOL':'CRYPTOCAP:SOL','XRP':'CRYPTOCAP:XRP',
   };
-  return MAP[raw] || raw;
+  if (MAP[raw]) return MAP[raw];
+  const r = String(raw).trim();
+  let m;
+  if ((m = r.match(/^(\d{1,5})(\.HK)?$/i))) return 'HKEX:' + parseInt(m[1], 10);
+  if ((m = r.match(/^(.+)\.L$/i))) return 'LSE:' + m[1];
+  if ((m = r.match(/^(.+)\.T$/i))) return 'TSE:' + m[1];
+  return r;
 }
 // Your own TradingView (Pro) account. Optional: paste the ID of a saved chart layout
 // (the part after /chart/ in its address, e.g. 'AbC123xY') to always open that layout.

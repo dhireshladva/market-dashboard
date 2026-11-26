@@ -529,9 +529,48 @@ def fetch_naaim():
         return None
 
 # ── S&P 500 BREADTH COMPUTATION ──────────────────────────────────────────────────────────────────────
-def compute_sp500_breadth():
-    """Download S&P 500 component data and compute breadth metrics."""
+def get_nasdaq100_tickers():
+    """Nasdaq-100 component list from Wikipedia (table id='constituents', 'Ticker' column)."""
+    from bs4 import BeautifulSoup
+    print("  Fetching Nasdaq-100 component list...")
+    r = requests.get('https://en.wikipedia.org/wiki/List_of_NASDAQ-100_companies',
+                     timeout=15, headers={'User-Agent': 'Mozilla/5.0'})
+    r.raise_for_status()
+    soup = BeautifulSoup(r.text, 'html.parser')
+    table = soup.find('table', {'id': 'constituents'})
+    if not table:
+        raise ValueError("Nasdaq-100 constituents table not found")
+    rows = table.find_all('tr')
+    headers = [th.get_text(strip=True).lower() for th in rows[0].find_all('th')]
+    col = 0
+    for i, h in enumerate(headers):
+        if h.startswith('ticker') or h.startswith('symbol'):
+            col = i
+            break
+    tickers = []
+    for row in rows[1:]:
+        cells = row.find_all(['td', 'th'])
+        if len(cells) > col:
+            t = cells[col].get_text(strip=True).replace('.', '-')
+            if t:
+                tickers.append(t)
+    if len(tickers) < 50:
+        raise ValueError(f"Only {len(tickers)} Nasdaq-100 tickers found")
+    return tickers
+
+def compute_ndx_breadth():
+    """Same breadth metrics as the S&P 500, for the Nasdaq-100."""
     try:
+        tickers = get_nasdaq100_tickers()
+    except Exception as e:
+        print(f"  ⚠ Nasdaq-100 list failed: {e}")
+        return None
+    return compute_sp500_breadth(tickers=tickers, label='Nasdaq-100')
+
+def compute_sp500_breadth(tickers=None, label='S&P 500'):
+    """Download index component data and compute breadth metrics (S&P 500 by default)."""
+    try:
+      if tickers is None:
         from bs4 import BeautifulSoup
         # Get S&P 500 component list from Wikipedia using built-in html.parser
         print("  Fetching S&P 500 component list...")
@@ -549,7 +588,8 @@ def compute_sp500_breadth():
                 tickers.append(cells[0].get_text(strip=True).replace('.', '-'))
         if not tickers:
             raise ValueError("No tickers found in Wikipedia table")
-        print(f"  Downloading {len(tickers)} tickers (1 year of daily closes)...")
+      if True:
+        print(f"  [{label}] Downloading {len(tickers)} tickers (1 year of daily closes)...")
         raw = yf.download(tickers, period='1y', interval='1d',
                           auto_adjust=True, progress=False, threads=True)
         if raw.empty:
@@ -601,7 +641,7 @@ def compute_sp500_breadth():
             'pct_above_sma200': p200,
         }
     except Exception as e:
-        print(f"  ⚠ S&P 500 breadth failed: {e}")
+        print(f"  ⚠ {label} breadth failed: {e}")
         return None
 
 # ── BREADTH WRAPPER ──────────────────────────────────────────────────────────────────────────────────
@@ -619,6 +659,7 @@ def fetch_breadth():
         'pct_above_sma20':  sp.get('pct_above_sma20')  if sp else None,
         'pct_above_sma50':  sp.get('pct_above_sma50')  if sp else None,
         'pct_above_sma200': sp.get('pct_above_sma200') if sp else None,
+        'nasdaq100':        compute_ndx_breadth(),
     }
     return result
 

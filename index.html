@@ -126,6 +126,8 @@ td:first-child,td.l{text-align:left}
 #tv-modal-title{font-size:11.5px;color:var(--accent);letter-spacing:1.5px;text-transform:uppercase;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #tv-modal-hdr button{background:none;border:1px solid var(--border2);color:var(--text3);font-family:var(--mono);font-size:9.5px;letter-spacing:1px;padding:4px 8px;border-radius:2px;cursor:pointer;text-transform:uppercase}
 #tv-modal-hdr button:hover{border-color:var(--red);color:var(--red)}
+#tv-modal-hdr button#tv-open-full{border-color:var(--accent);color:var(--accent)}
+#tv-modal-hdr button#tv-open-full:hover{background:var(--accent);color:var(--bg);border-color:var(--accent)}
 #tv-frame-wrap{flex:1;overflow:hidden}
 #tv-frame{width:100%;height:100%;border:none}
 /* ── PCT BAR ── */
@@ -454,6 +456,7 @@ td:first-child,td.l{text-align:left}
   <div id="tv-modal-box">
     <div id="tv-modal-hdr">
       <div id="tv-modal-title">—</div>
+      <button id="tv-open-full" onclick="openFullTV()" title="Open this symbol in your own TradingView account (new tab). Tip: Shift+click a ticker to go straight there.">↗ &nbsp;OPEN IN MY TRADINGVIEW</button>
       <button onclick="closeChart()">✕ &nbsp;CLOSE</button>
     </div>
     <div id="tv-frame-wrap">
@@ -1096,8 +1099,19 @@ function toTvSym(raw) {
   };
   return MAP[raw] || raw;
 }
+// Your own TradingView (Pro) account. Optional: paste the ID of a saved chart layout
+// (the part after /chart/ in its address, e.g. 'AbC123xY') to always open that layout.
+const TV_LAYOUT_ID = '';
+let currentTvSym = '';
+function openFullTV(sym) {
+  const s = sym || currentTvSym;
+  if (!s) return;
+  const base = 'https://www.tradingview.com/chart/' + (TV_LAYOUT_ID ? TV_LAYOUT_ID + '/' : '');
+  window.open(base + '?symbol=' + encodeURIComponent(s), '_blank', 'noopener');
+}
 function openChart(rawSym, name) {
   const tvSym = toTvSym(rawSym);
+  currentTvSym = tvSym;
   document.getElementById('tv-modal-title').textContent = (name || rawSym) + '  ·  ' + tvSym;
   const url = 'https://s.tradingview.com/widgetembed/?frameElementId=tv_frame'
     + '&symbol=' + encodeURIComponent(tvSym)
@@ -1118,7 +1132,7 @@ function closeChart() {
 document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeChart(); });
 document.addEventListener('click', function(e){
   const t = e.target.closest('.tn-link');
-  if(t){ const s=t.getAttribute('data-sym'), n=t.getAttribute('data-nm')||s; openChart(s,n); }
+  if(t){ const s=t.getAttribute('data-sym'), n=t.getAttribute('data-nm')||s; if(e.shiftKey){ openFullTV(toTvSym(s)); } else { openChart(s,n); } }
 });
 
 

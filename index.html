@@ -25,8 +25,8 @@
   --amber:   #ffb300;
   --adim2:   rgba(255,179,0,0.09);
   --text:    #c8d8ea;
-  --text2:   #a9c1d9;
-  --text3:   #8ea8c2;
+  --text2:   #d4e0ec;
+  --text3:   #c4d3e2;
   --mono:    'IBM Plex Mono', monospace;
   --sans:    'DM Sans', sans-serif;
 }
@@ -200,7 +200,7 @@ td:first-child,td.l{text-align:left}
 
 /* ── EMA TREND INDICATOR ── */
 .ema-up{color:var(--green);font-size:13px;font-weight:600}
-.ema-dn{color:var(--text3);font-size:12px;opacity:0.5}
+.ema-dn{color:var(--text3);font-size:12px;opacity:0.8}
 
 /* ── LOADING STATE ── */
 .loading{color:var(--text3);font-size:11px;letter-spacing:1px;padding:14px;text-align:center;animation:fade .8s infinite alternate}
@@ -228,6 +228,11 @@ td:first-child,td.l{text-align:left}
       <strong id="hdr-time">—</strong>
     </div>
     <div class="live"><span class="dot"></span>UK LIVE</div>
+    <div class="hdr-meta" style="margin-left:18px;padding-left:18px;border-left:1px solid var(--border2)">
+      <div id="hdr-date-us" style="letter-spacing:1px">—</div>
+      <strong id="hdr-time-us">—</strong>
+    </div>
+    <div class="live"><span class="dot"></span>US ET</div>
   </div>
   <div class="hdr-r">
     <span id="lastUpdatedBadge" style="font-size:9px;color:var(--text3);letter-spacing:1px;padding:4px 8px;background:var(--bg3);border:1px solid var(--border);border-radius:2px">LOADING DATA...</span>
@@ -795,6 +800,9 @@ function tick() {
   const m=String(hkt.getMinutes()).padStart(2,'0');
   const s=String(hkt.getSeconds()).padStart(2,'0');
   document.getElementById('hdr-time').textContent=`${h}:${m}:${s}`;
+  const ny = new Date(now.toLocaleString('en-US',{timeZone:'America/New_York'}));
+  document.getElementById('hdr-date-us').textContent=`${D[ny.getDay()]} · ${ny.getDate()} ${M[ny.getMonth()]} ${ny.getFullYear()}`;
+  document.getElementById('hdr-time-us').textContent=`${String(ny.getHours()).padStart(2,'0')}:${String(ny.getMinutes()).padStart(2,'0')}:${String(ny.getSeconds()).padStart(2,'0')}`;
 }
 setInterval(tick,1000); tick();
 
@@ -989,8 +997,9 @@ function renderAll(d) {
   if(d.generated_at){
     const dt=new Date(d.generated_at);
     const hkt=new Date(dt.toLocaleString('en-US',{timeZone:'Europe/London'}));
+    const nyd=new Date(dt.toLocaleString('en-US',{timeZone:'America/New_York'}));
     const M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    const label=`DATA: ${hkt.getDate()} ${M[hkt.getMonth()]} ${hkt.getFullYear()} · ${String(hkt.getHours()).padStart(2,'0')}:${String(hkt.getMinutes()).padStart(2,'0')} UK`;
+    const label=`DATA: ${hkt.getDate()} ${M[hkt.getMonth()]} ${hkt.getFullYear()} · ${String(hkt.getHours()).padStart(2,'0')}:${String(hkt.getMinutes()).padStart(2,'0')} UK · ${String(nyd.getHours()).padStart(2,'0')}:${String(nyd.getMinutes()).padStart(2,'0')} ET`;
     document.getElementById('lastUpdatedBadge').textContent=label;
     document.getElementById('lastUpdatedBadge').style.color='var(--green)';
     document.getElementById('dataStatus').textContent='✓ Market data loaded — EOD prices';

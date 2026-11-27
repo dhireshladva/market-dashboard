@@ -1020,8 +1020,42 @@ function renderAll(d) {
     // How stale?
     const ageHrs=Math.round((Date.now()-dt.getTime())/3600000);
     document.getElementById('dataAge').textContent=`Updated ${ageHrs}h ago · Refreshes weekdays 16:45 & 21:25 UK`;
+    window.__genAt = dt;
+    checkStale();
   }
 }
+
+// ── Stale-data warning: turns the status bar red if a scheduled refresh (weekdays 16:45 / 21:25 UK) is more than 30 min overdue ──
+function checkStale(){
+  const g = window.__genAt; if (!g) return;
+  const L = x => new Date(x.toLocaleString('en-US', {timeZone:'Europe/London'}));
+  const now = L(new Date()), gen = L(g);
+  const D = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'], M = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  let slot = null;
+  for (let k = 0; k < 8 && !slot; k++) {
+    const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - k);
+    if (d.getDay() === 0 || d.getDay() === 6) continue;
+    for (const [h, m] of [[21,25],[16,45]]) {
+      const s = new Date(d.getFullYear(), d.getMonth(), d.getDate(), h, m);
+      if (s.getTime() + 30*60000 <= now.getTime()) { slot = s; break; }
+    }
+  }
+  if (!slot) return;
+  const st = document.getElementById('dataStatus'), bar = document.getElementById('dataStatusBar');
+  if (gen < slot) {
+    const lbl = `${D[slot.getDay()]} ${slot.getDate()} ${M[slot.getMonth()]} ${String(slot.getHours()).padStart(2,'0')}:${String(slot.getMinutes()).padStart(2,'0')}`;
+    st.innerHTML = `⚠ DATA NOT REFRESHED — the ${lbl} UK refresh hasn't run yet. <a href="https://github.com/dhireshladva/market-dashboard/actions/workflows/fetch-data.yml" target="_blank" rel="noopener" style="color:#fff;background:var(--red);padding:2px 8px;border-radius:3px;text-decoration:none;margin-left:8px">RUN IT NOW ↗</a>`;
+    st.style.color = 'var(--red)';
+    bar.style.borderColor = 'var(--red)';
+    bar.style.background = 'rgba(255,59,92,0.12)';
+  } else {
+    st.textContent = '✓ Market data loaded — EOD prices';
+    st.style.color = 'var(--green)';
+    bar.style.borderColor = '';
+    bar.style.background = '';
+  }
+}
+setInterval(checkStale, 5*60000);
 
 async function loadData(){
   try {
